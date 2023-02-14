@@ -1,0 +1,6 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "dc_dc")(type "KiCad")(uri "${KIPRJMOD}/dc_dc_boost_3.3v.kicad_sym")(options "")(descr ""))
+  (lib (name "esp32")(type "KiCad")(uri "${KIPRJMOD}/WEMOS_S2_mini.kicad_sym")(options "")(descr ""))
+  (lib (name "AHT21")(type "KiCad")(uri "${KIPRJMOD}/aht21_board-1.kicad_sym")(options "")(descr ""))
+)
