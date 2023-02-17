@@ -35,10 +35,34 @@ time.sleep(1)
 
 g = displayio.Group()
 
-text = label.Label(terminalio.FONT, text="test")
-text.anchor_point = (0.0, 0.0)
-text.anchored_position = (0, 0)
-text.scale = 8
+# Set a white background
+# Create the display object - the third color is red (0xff0000)
+DISPLAY_WIDTH = 200
+DISPLAY_HEIGHT = 200
+BLACK = 0x000000
+WHITE = 0xFFFFFF
+FOREGROUND_COLOR = BLACK
+BACKGROUND_COLOR = WHITE
+
+background_bitmap = displayio.Bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1)
+# Map colors in a palette
+palette = displayio.Palette(1)
+palette[0] = BACKGROUND_COLOR
+# Create a Tilegrid with the background and put in the displayio group
+t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
+g.append(t)
+
+# Draw simple text using the built-in font into a displayio group
+text_group = displayio.Group(scale=5, x=4, y=20)
+text = "Hello World!"
+text_area = label.Label(terminalio.FONT, text=text, color=FOREGROUND_COLOR)
+text_group.append(text_area) # Add this text to the text group
+g.append(text_group)
+
+# text = label.Label(terminalio.FONT, text="test")
+# text.anchor_point = (0.0, 0.0)
+# text.anchored_position = (0, 0)
+# text.scale = 8
 
 # text_group = displayio.Group()
 # text_group.append(text)
@@ -51,29 +75,16 @@ text.scale = 8
 
 counter = 0
 
-with open("/display-ruler.bmp", "rb") as f:
-    pic = displayio.OnDiskBitmap(f)
-    # CircuitPython 6 & 7 compatible
-    t = displayio.TileGrid(
-        pic, pixel_shader=getattr(pic, "pixel_shader", displayio.ColorConverter())
-    )
-    # CircuitPython 7 compatible only
-    # t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
-    # g.append(t)
-    g.append(text)
+while True:
 
-    while True:
+  counter += 1
+  text_area.text = str(counter)
 
-      counter += 1
-      text.text = str(counter)
+  display.show(g)
+  display.refresh()
+  print("refreshed")
 
-      display.show(g)
-
-      display.refresh()
-
-      print("refreshed")
-
-      time.sleep(180)
+  time.sleep(180)
 
 
 
