@@ -50,15 +50,27 @@ t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
 g.append(t)
 
 
-text_1_group = displayio.Group(x = 4, y = 20, scale = 3)
-text_area_1 = label.Label(terminalio.FONT, color = FOREGROUND_COLOR)
-text_1_group.append(text_area_1)
-g.append(text_1_group)
+text_area_1 = label.Label(terminalio.FONT, text="Temperature", color=FOREGROUND_COLOR, scale=3)
+text_area_1.anchor_point = 0.0, 0.0
+text_area_1.anchored_position = 4, 20
 
-text_2_group = displayio.Group(x = 4, y = 120, scale = 3)
-text_area_2 = label.Label(terminalio.FONT, color = FOREGROUND_COLOR)
-text_2_group.append(text_area_2)
-g.append(text_2_group)
+text_temp = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
+text_temp.anchor_point = 1.0, 0.0
+text_temp.anchored_position = DISPLAY_WIDTH, 60
+
+g.append(text_area_1)
+g.append(text_temp)
+
+text_area_2 = label.Label(terminalio.FONT, text="Humidity", color=FOREGROUND_COLOR, scale=3)
+text_area_2.anchor_point = 0.0, 0.0
+text_area_2.anchored_position = 4, 120
+
+text_humidity = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
+text_humidity.anchor_point = 1.0, 0.0
+text_humidity.anchored_position = DISPLAY_WIDTH, 160
+
+g.append(text_area_2)
+g.append(text_humidity)
 
 while True:
   # print()
@@ -66,10 +78,10 @@ while True:
   # print(temperature_humidity_sensor.relative_humidity)
 
   temperature = round(temperature_humidity_sensor.temperature, 1)
-  text_area_1.text = f'Temperature\n     {temperature} ºC'
+  text_temp.text = f'{temperature} ºC'
 
   humidity = int(round(temperature_humidity_sensor.relative_humidity, 0))
-  text_area_2.text = f'Humidity\n       {humidity} %'
+  text_humidity.text = f'{humidity} %'
 
   display.show(g)
   display.refresh()
