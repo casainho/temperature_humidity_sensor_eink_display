@@ -1,23 +1,32 @@
 # DIY Temperature and Humidity sensor using EInk display
 
-This DIY sensor uses the temperature sensor is the AHT21.
+This is a simple DIY Temperature and Humidity sensor, with a small EInk display and integration with Home Assistant.
 
-The display is a 1.54 inches EInk display.
-
-The microcontroller board is the ESP32-S2, running Pyhton (CircuitPython) firmware.
+**Main characteristics:** 
+* Easy DIY, OpenSource and easy repairable
+* Uses the factory calibrated temperature and humidity sensor AHT21
+* The display is a 1.54 inches EInk display
+* The microcontroller board is the ESP32-S2, running Pyhton (CircuitPython) firmware
+* The systemn runs from a pair of NiMH batteries or one Lithium-ion battery, as the DC-DC boost converter supports input voltage from 1V up to 5V, and outputs a fixed 5V
 
 All the components were bought on Aliexpress.
 
+## Status and planned features
+- [x] Develop and test the hardware
+- [ ] [Optimize the power usage](https://learn.adafruit.com/deep-sleep-with-circuitpython)
+- [x] Show numeric values of humidity and temperature
+- [ ] Show graph from last 24h of humidity and temperature (10 minutes each measurement)
+- [ ] [Send humidity and temperature to HomeAssistant](https://learn.adafruit.com/temperature-and-humidity-sensing-in-home-assistant-with-circuitpython)
+
 ## Pictures
 
-Pictures from prototype on 2023.02.17.
+Pictures from prototype on 2023.02.22.
 
 Showing the temperature and humidity values:<br>
-![](prototype_05-2023.02.17.jpg)
+![](prototype_01-2023.02.22.jpg)
 
-Details of the DIY build. Black board is the 1.54 inches EInk display, the purple board is the ESP32-S2 board (Lolin S2 Mini) and the blue board is the AHT21 sensor:<br>
-![](prototype_03-2023.02.17.jpg)
+Details of the DIY build. Black board is the 1.54 inches EInk display, the purple board is the ESP32-S2 board (Lolin S2 Mini), the blue board is the AHT21 sensor and the green board is a DC-DC boost converter module that transforms the 2.4V from the NiMH batteries to 5V to power the ESP32-S2 board and all other components:<br>
+![](prototype_02-2023.02.22.jpg)
 
-![](prototype_04-2023.02.17.jpg)
 
 
