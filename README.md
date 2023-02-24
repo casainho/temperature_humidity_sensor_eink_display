@@ -18,7 +18,7 @@ All the components were bought on Aliexpress.
 - [x] Develop and test the 3D printed enclosure
 - [x] Show numeric values of humidity and temperature
 - [ ] [Optimize the power usage](https://learn.adafruit.com/deep-sleep-with-circuitpython)
-- [ ] Show graph from last 24h of humidity and temperature (10 minutes each measurement)
+- [ ] [Show graph from last 24h of humidity and temperature (10 minutes each measurement)](https://github.com/jposada202020/CircuitPython_uplot)
 - [ ] [Send humidity and temperature to HomeAssistant](https://learn.adafruit.com/temperature-and-humidity-sensing-in-home-assistant-with-circuitpython)
 
 ## Pictures
