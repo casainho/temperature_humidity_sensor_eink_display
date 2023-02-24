@@ -29,13 +29,13 @@ Showing the temperature and humidity values:<br>
 [<img src=prototype_01-2023.02.24.jpg width=300>](prototype_01-2023.02.24.jpg)
 
 Details of the 3D printed enclosure:<br>
-[<img src=prototype_02-2023.02.24.jpg height=200>](prototype_02-2023.02.24.jpg) [<img src=prototype_03-2023.02.24.jpg height=200>](prototype_03-2023.02.24.jpg)
+[<img src=prototype_02-2023.02.24.jpg width=300>](prototype_02-2023.02.24.jpg) [<img src=prototype_03-2023.02.24.jpg height=200>](prototype_03-2023.02.24.jpg)
 
 Details of the DIY electronics:<br>
-[<img src=prototype_01-2023.02.22.jpg height=300>](prototype_01-2023.02.22.jpg)
+[<img src=prototype_01-2023.02.22.jpg width=300>](prototype_01-2023.02.22.jpg)
 
 Details of the DIY build. Black board is the 1.54 inches EInk display, the purple board is the ESP32-S2 board (Lolin S2 Mini), the blue board is the AHT21 sensor and the green board is a DC-DC boost converter module that transforms the 2.4V from the NiMH batteries to 5V to power the ESP32-S2 board and all other components:<br>
-[<img src=prototype_02-2023.02.22.jpg height=300>](prototype_02-2023.02.22.jpg)
+[<img src=prototype_02-2023.02.22.jpg width=300>](prototype_02-2023.02.22.jpg)
 
 
 
