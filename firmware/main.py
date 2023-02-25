@@ -6,6 +6,12 @@ import adafruit_ssd1681
 import adafruit_ahtx0
 from adafruit_display_text import label
 import terminalio
+import wifi
+
+##################################################
+# Try to save power
+wifi.radio.enabled = False # This disables at least the web workflow, tested on CircuitPyhton 8.0.3
+##################################################
 
 i2c = busio.I2C(
     board.IO37, # SCLK pin
