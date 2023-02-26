@@ -20,6 +20,8 @@ supervisor.runtime.rgb_status_brightness = 0 # set the board LED brightness to 0
 ##################################################
 # Let's keep track of number of times we run, by incrementing a counter
 
+# NOTE: alarm.sleep_memory array size is 4096 bytes on ESP32-S2, CircuitPyhton 8.0.3
+
 if not alarm.wake_alarm:
   # reset counter at a power on reset
   counter = 0
