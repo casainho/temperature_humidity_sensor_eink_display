@@ -6,15 +6,15 @@ import adafruit_ssd1681
 import adafruit_ahtx0
 from adafruit_display_text import label
 import terminalio
-import wifi
 import alarm
 import supervisor
 
 ##################################################
 # try to save power
-supervisor.Runtime.rgb_status_brightness = 0 # set the board LED brightness to 0
+supervisor.runtime.rgb_status_brightness = 0 # set the board LED brightness to 0
 
-wifi.radio.enabled = False # This disables at least the web workflow, tested on CircuitPyhton 8.0.3
+# NOTE: seems that disabling the radio takes to much power that the board can not boot from a 2 x AAA NiMH batteries 
+# wifi.radio.enabled = False # This disables at least the web workflow, tested on CircuitPyhton 8.0.3
 ##################################################
 
 ##################################################
@@ -107,25 +107,23 @@ text_counter.anchor_point = 0.0, 0.0
 text_counter.anchored_position = 0, 180
 g.append(text_counter)
 
-while True:
-  # print()
-  # print(temperature_humidity_sensor.temperature)
-  # print(temperature_humidity_sensor.relative_humidity)
+# print()
+# print(temperature_humidity_sensor.temperature)
+# print(temperature_humidity_sensor.relative_humidity)
 
-  temperature = round(temperature_humidity_sensor.temperature, 1)
-  text_temp.text = f'{temperature} ºC'
+temperature = round(temperature_humidity_sensor.temperature, 1)
+text_temp.text = f'{temperature} ºC'
 
-  humidity = int(round(temperature_humidity_sensor.relative_humidity, 0))
-  text_humidity.text = f'{humidity} %'
+humidity = int(round(temperature_humidity_sensor.relative_humidity, 0))
+text_humidity.text = f'{humidity} %'
 
-  text_counter.text = f'{counter}'
+text_counter.text = f'{counter}'
 
-  display.show(g)
-  display.refresh()
+display.show(g)
+display.refresh()
 
-  # sleep for 180 seconds that is the min time of display refresh
-  seconds_to_sleep = 180 + 10
-  alarm_to_sleep = alarm.time.TimeAlarm(monotonic_time = time.monotonic() + seconds_to_sleep)
-  alarm.exit_and_deep_sleep_until_alarms(alarm_to_sleep)
-  # Does not return. Exits, and restarts after the sleep time.
-  
+# sleep for 180 seconds that is the min time of display refresh
+seconds_to_sleep = 180 + 10
+alarm_to_sleep = alarm.time.TimeAlarm(monotonic_time = time.monotonic() + seconds_to_sleep)
+alarm.exit_and_deep_sleep_until_alarms(alarm_to_sleep)
+# Does not return. Exits, and restarts after the sleep time.
