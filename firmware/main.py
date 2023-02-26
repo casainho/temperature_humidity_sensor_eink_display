@@ -7,10 +7,31 @@ import adafruit_ahtx0
 from adafruit_display_text import label
 import terminalio
 import wifi
+import alarm
 
 ##################################################
 # Try to save power
 wifi.radio.enabled = False # This disables at least the web workflow, tested on CircuitPyhton 8.0.3
+##################################################
+
+##################################################
+# Let's keep track of number of times we run, by incrementing a counter
+
+if not alarm.wake_alarm:
+  # reset counter at a power on reset
+  counter = 0
+else:
+  # get the counter
+  counter = (alarm.sleep_memory[0] << 24) + (alarm.sleep_memory[1] << 16) + (alarm.sleep_memory[2] << 8) + alarm.sleep_memory[3]
+   
+# let's increase the counter
+counter += 1
+
+# store the counter
+alarm.sleep_memory[0] = (counter >> 24 & 0xff)
+alarm.sleep_memory[1] = (counter >> 16 & 0xff)
+alarm.sleep_memory[2] = (counter >> 8 & 0xff)
+alarm.sleep_memory[3] = (counter & 0xff)
 ##################################################
 
 i2c = busio.I2C(
@@ -58,25 +79,30 @@ g.append(t)
 
 text_area_1 = label.Label(terminalio.FONT, text="Temperature", color=FOREGROUND_COLOR, scale=3)
 text_area_1.anchor_point = 0.0, 0.0
-text_area_1.anchored_position = 4, 20
+text_area_1.anchored_position = 4, 0
 
 text_temp = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
 text_temp.anchor_point = 1.0, 0.0
-text_temp.anchored_position = DISPLAY_WIDTH, 60
+text_temp.anchored_position = DISPLAY_WIDTH, 40
 
 g.append(text_area_1)
 g.append(text_temp)
 
 text_area_2 = label.Label(terminalio.FONT, text="Humidity", color=FOREGROUND_COLOR, scale=3)
 text_area_2.anchor_point = 0.0, 0.0
-text_area_2.anchored_position = 4, 120
+text_area_2.anchored_position = 4, 90
 
 text_humidity = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
 text_humidity.anchor_point = 1.0, 0.0
-text_humidity.anchored_position = DISPLAY_WIDTH, 160
+text_humidity.anchored_position = DISPLAY_WIDTH, 135
 
 g.append(text_area_2)
 g.append(text_humidity)
+
+text_counter = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale = 2)
+text_counter.anchor_point = 0.0, 0.0
+text_counter.anchored_position = 0, 180
+g.append(text_counter)
 
 while True:
   # print()
@@ -89,7 +115,14 @@ while True:
   humidity = int(round(temperature_humidity_sensor.relative_humidity, 0))
   text_humidity.text = f'{humidity} %'
 
+  text_counter.text = f'{counter}'
+
   display.show(g)
   display.refresh()
 
-  time.sleep(180)
+  # sleep for 180 seconds that is the min time of display refresh
+  seconds_to_sleep = 180 + 10
+  alarm_to_sleep = alarm.time.TimeAlarm(monotonic_time = time.monotonic() + seconds_to_sleep)
+  alarm.exit_and_deep_sleep_until_alarms(alarm_to_sleep)
+  # Does not return. Exits, and restarts after the sleep time.
+  
