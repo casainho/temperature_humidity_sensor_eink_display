@@ -12,9 +12,6 @@ import supervisor
 ##################################################
 # try to save power
 supervisor.runtime.rgb_status_brightness = 0 # set the board LED brightness to 0
-
-# NOTE: seems that disabling the radio takes to much power that the board can not boot from a 2 x AAA NiMH batteries 
-# wifi.radio.enabled = False # This disables at least the web workflow, tested on CircuitPyhton 8.0.3
 ##################################################
 
 ##################################################
@@ -27,16 +24,15 @@ if not alarm.wake_alarm:
   counter = 0
 else:
   # get the counter
-  counter = (alarm.sleep_memory[0] << 24) + (alarm.sleep_memory[1] << 16) + (alarm.sleep_memory[2] << 8) + alarm.sleep_memory[3]
+  counter = (alarm.sleep_memory[0] << 16) + (alarm.sleep_memory[1] << 8) + alarm.sleep_memory[2]
    
 # let's increase the counter
 counter += 1
 
 # store the counter
-alarm.sleep_memory[0] = (counter >> 24 & 0xff)
-alarm.sleep_memory[1] = (counter >> 16 & 0xff)
-alarm.sleep_memory[2] = (counter >> 8 & 0xff)
-alarm.sleep_memory[3] = (counter & 0xff)
+alarm.sleep_memory[0] = (counter >> 16 & 0xff)
+alarm.sleep_memory[1] = (counter >> 8 & 0xff)
+alarm.sleep_memory[2] = (counter & 0xff)
 ##################################################
 
 i2c = busio.I2C(
@@ -60,7 +56,6 @@ display_bus = displayio.FourWire(
     baudrate = 1000000)
 
 display = adafruit_ssd1681.SSD1681(display_bus, width = 200, height = 200, busy_pin = board.IO12, rotation = 0)
-time.sleep(1)
 
 g = displayio.Group()
 
@@ -125,7 +120,7 @@ display.show(g)
 display.refresh()
 
 # sleep for 180 seconds that is the min time of display refresh
-seconds_to_sleep = 180 + 10
+seconds_to_sleep = 180
 alarm_to_sleep = alarm.time.TimeAlarm(monotonic_time = time.monotonic() + seconds_to_sleep)
 alarm.exit_and_deep_sleep_until_alarms(alarm_to_sleep)
 # Does not return. Exits, and restarts after the sleep time.
