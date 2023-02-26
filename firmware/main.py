@@ -8,9 +8,12 @@ from adafruit_display_text import label
 import terminalio
 import wifi
 import alarm
+import supervisor
 
 ##################################################
-# Try to save power
+# try to save power
+supervisor.Runtime.rgb_status_brightness = 0 # set the board LED brightness to 0
+
 wifi.radio.enabled = False # This disables at least the web workflow, tested on CircuitPyhton 8.0.3
 ##################################################
 
