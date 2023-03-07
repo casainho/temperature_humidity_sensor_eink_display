@@ -31,26 +31,39 @@ historic_humidity_simulated = [round(value / 2, 1) for value in range(5, 149, 1)
 class Sensor(object):
   def __init__(self, i2c_clk_pin, i2c_sda_pin):
     i2c = busio.I2C(i2c_clk_pin, i2c_sda_pin)
-    temperature_humidity_sensor = adafruit_ahtx0.AHTx0(i2c)
+    self.temperature_humidity_sensor = adafruit_ahtx0.AHTx0(i2c)
+    self.last_temperature = 0
+    self.last_humidity = 0
 
   def run_periodic(self):
     "Must be called ever 5 minutes: will read and store the sensor data"
-    # temperature_humidity_sensor.temperature
-    # temperature_humidity_sensor.relative_humidity
-    pass
+    self.last_temperature = round(self.temperature_humidity_sensor.temperature, 1)
+    self.last_humidity = round(self.temperature_humidity_sensor.relative_humidity, 1)
 
+  @property
+  def temperature(self):
+    return self.last_temperature
+  
+  @property
+  def humidity(self):
+    return self.last_humidity
+
+  @property
   def historic_data_temperature(self):
     "Return an array of data"
     return []
 
+  @property
   def historic_data_humidity(self):
     "Return an array of data"
     return []
 
+  @property
   def historic_data_temperature_simulated(self):
     "Return an array of simulated data"
     return historic_temperature_simulated
 
+  @property
   def historic_data_humidity_simulated(self):
     "Return an array of simulated data"
     return historic_humidity_simulated
