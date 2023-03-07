@@ -8,38 +8,9 @@ from adafruit_display_text import label
 import terminalio
 import alarm
 import supervisor
+import sensor
 
-##################################################
-# try to save power
-supervisor.runtime.rgb_status_brightness = 0 # set the board LED brightness to 0
-##################################################
-
-##################################################
-# Let's keep track of number of times we run, by incrementing a counter
-
-# NOTE: alarm.sleep_memory array size is 4096 bytes on ESP32-S2, CircuitPyhton 8.0.3
-
-if not alarm.wake_alarm:
-  # reset counter at a power on reset
-  counter = 0
-else:
-  # get the counter
-  counter = (alarm.sleep_memory[0] << 16) + (alarm.sleep_memory[1] << 8) + alarm.sleep_memory[2]
-   
-# let's increase the counter
-counter += 1
-
-# store the counter
-alarm.sleep_memory[0] = (counter >> 16 & 0xff)
-alarm.sleep_memory[1] = (counter >> 8 & 0xff)
-alarm.sleep_memory[2] = (counter & 0xff)
-##################################################
-
-i2c = busio.I2C(
-    board.IO37, # SCLK pin
-    board.IO35) # SDA pin)
-
-temperature_humidity_sensor = adafruit_ahtx0.AHTx0(i2c)
+_sensor = sensor.Sensor(board.IO37, board.IO35)
 
 displayio.release_displays()
 
@@ -53,11 +24,11 @@ display_bus = displayio.FourWire(
     command = board.IO9,
     reset = board.IO11,
     chip_select = board.IO7,
-    baudrate = 1000000)
+    baudrate = 60000000)
 
 display = adafruit_ssd1681.SSD1681(display_bus, width = 200, height = 200, busy_pin = board.IO12, rotation = 0)
 
-g = displayio.Group()
+# g = displayio.Group()
 
 # Set a white background
 # Create the display object - the third color is red (0xff0000)
@@ -68,59 +39,104 @@ WHITE = 0xFFFFFF
 FOREGROUND_COLOR = BLACK
 BACKGROUND_COLOR = WHITE
 
-background_bitmap = displayio.Bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1)
-# Map colors in a palette
-palette = displayio.Palette(1)
-palette[0] = BACKGROUND_COLOR
-# Create a Tilegrid with the background and put in the displayio group
-t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
-g.append(t)
+# background_bitmap = displayio.Bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1)
+# # Map colors in a palette
+# palette = displayio.Palette(1)
+# palette[0] = BACKGROUND_COLOR
+# # Create a Tilegrid with the background and put in the displayio group
+# t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
+# g.append(t)
 
 
-text_area_1 = label.Label(terminalio.FONT, text="Temperature", color=FOREGROUND_COLOR, scale=3)
-text_area_1.anchor_point = 0.0, 0.0
-text_area_1.anchored_position = 4, 0
+# text_area_1 = label.Label(terminalio.FONT, text="Temperature", color=FOREGROUND_COLOR, scale=3)
+# text_area_1.anchor_point = 0.0, 0.0
+# text_area_1.anchored_position = 4, 0
 
-text_temp = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
-text_temp.anchor_point = 1.0, 0.0
-text_temp.anchored_position = DISPLAY_WIDTH, 40
+# text_temp = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
+# text_temp.anchor_point = 1.0, 0.0
+# text_temp.anchored_position = DISPLAY_WIDTH, 40
 
-g.append(text_area_1)
-g.append(text_temp)
+# g.append(text_area_1)
+# g.append(text_temp)
 
-text_area_2 = label.Label(terminalio.FONT, text="Humidity", color=FOREGROUND_COLOR, scale=3)
-text_area_2.anchor_point = 0.0, 0.0
-text_area_2.anchored_position = 4, 90
+# text_area_2 = label.Label(terminalio.FONT, text="Humidity", color=FOREGROUND_COLOR, scale=3)
+# text_area_2.anchor_point = 0.0, 0.0
+# text_area_2.anchored_position = 4, 90
 
-text_humidity = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
-text_humidity.anchor_point = 1.0, 0.0
-text_humidity.anchored_position = DISPLAY_WIDTH, 135
+# text_humidity = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
+# text_humidity.anchor_point = 1.0, 0.0
+# text_humidity.anchored_position = DISPLAY_WIDTH, 135
 
-g.append(text_area_2)
-g.append(text_humidity)
+# g.append(text_area_2)
+# g.append(text_humidity)
 
-text_counter = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale = 2)
-text_counter.anchor_point = 0.0, 0.0
-text_counter.anchored_position = 0, 180
-g.append(text_counter)
+# text_counter = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale = 2)
+# text_counter.anchor_point = 0.0, 0.0
+# text_counter.anchored_position = 0, 180
+# g.append(text_counter)
 
-# print()
-# print(temperature_humidity_sensor.temperature)
-# print(temperature_humidity_sensor.relative_humidity)
+from ulab import numpy as np
+from circuitpython_uplot.uplot import Uplot
+from circuitpython_uplot.ucartesian import ucartesian
+plot_1 = Uplot(
+    20,
+    50,
+    200,
+    70,
+    padding = 1,
+    show_box = True,
+    background_color = WHITE)
 
-temperature = round(temperature_humidity_sensor.temperature, 1)
-text_temp.text = f'{temperature} ºC'
+plot_2 = Uplot(
+    0,
+    80,
+    200,
+    70,
+    padding = 1,
+    show_box = True,
+    background_color = WHITE)
 
-humidity = int(round(temperature_humidity_sensor.relative_humidity, 0))
-text_humidity.text = f'{humidity} %'
+# Setting up tick parameters
+plot_1.tick_params(tickheight = 10, tickcolor = BLACK, tickgrid = False)
+plot_2.tick_params(tickheight = 10, tickcolor = BLACK, tickgrid = False)
 
-text_counter.text = f'{counter}'
+# x = np.linspace(-4, 4, num=25)
+# constant = 1.0 / np.sqrt(2 * np.pi)
+# y = constant * np.exp((-(x**2)) / 2.0)
 
-display.show(g)
+x = list(range(0, 144, 1))
+ucartesian(plot_1, x, _sensor.historic_data_temperature_simulated(), line_color = BLACK)
+ucartesian(plot_2, x, _sensor.historic_data_humidity_simulated(), line_color = BLACK)
+plot_1.append(plot_2)
+display.show(plot_1)
+# display.show(plot_2)
 display.refresh()
 
-# sleep for 180 seconds that is the min time of display refresh
-seconds_to_sleep = 180
-alarm_to_sleep = alarm.time.TimeAlarm(monotonic_time = time.monotonic() + seconds_to_sleep)
-alarm.exit_and_deep_sleep_until_alarms(alarm_to_sleep)
-# Does not return. Exits, and restarts after the sleep time.
+# while True:
+  # print()
+  # print(temperature_humidity_sensor.temperature)
+  # print(temperature_humidity_sensor.relative_humidity)
+
+  # temperature = round(temperature_humidity_sensor.temperature, 1)
+  # text_temp.text = f'{temperature} cc'
+
+  # humidity = int(round(temperature_humidity_sensor.relative_humidity, 0))
+  # text_humidity.text = f'{humidity} %'
+
+  # text_counter.text = f'{counter}'
+
+  # display.show(g)
+  # display.refresh()
+
+  # time.sleep(2)
+  # print('done')
+
+  # while True:
+  #   pass
+
+  # # sleep for 180 seconds that is the min time of display refresh
+  # seconds_to_sleep = 180 + 10
+  # alarm_to_sleep = alarm.time.TimeAlarm(monotonic_time = time.monotonic() + seconds_to_sleep)
+  # alarm.exit_and_deep_sleep_until_alarms(alarm_to_sleep)
+  # # Does not return. Exits, and restarts after the sleep time.
+  
