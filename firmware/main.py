@@ -12,6 +12,7 @@ from ulab import numpy as np
 from circuitpython_uplot.uplot import Uplot
 from circuitpython_uplot.ucartesian import ucartesian
 import supervisor
+from adafruit_bitmap_font import bitmap_font
 
 # disable auto-reload
 supervisor.runtime.autoreload = False
@@ -81,9 +82,9 @@ text_humidity.text = f'{int(round(sensor.humidity, 0))}%'
 # g.append(text_counter)
 
 plot_1 = Uplot(
-    0,
+    20,
     50,
-    200,
+    179,
     60,
     padding = 1,
     show_box = True,
@@ -93,22 +94,66 @@ plot_1 = Uplot(
 plot_2 = Uplot(
     0,
     80,
-    200,
+    179,
     60,
     padding = 1,
     show_box = True,
     box_color = BLACK,
     background_color = WHITE)
 
-# Setting up tick parameters
+# # Setting up tick parameters
 # plot_1.tick_params(tickx_height = 5, ticky_height = 5, tickcolor = BLACK, tickgrid = False)
 # plot_2.tick_params(tickx_height = 5, ticky_height = 5, tickcolor = BLACK, tickgrid = False)
 
-x = list(range(0, 144, 1))
-ucartesian(plot_1, x, sensor.historic_data_temperature, rangex = [0, 143], rangey = [0, 40], fill = False, line_color = BLACK)
-ucartesian(plot_2, x, sensor.historic_data_humidity, rangex = [0, 143], rangey = [0, 100], fill = False, line_color = BLACK)
+# print(len(sensor.historic_data_temperature))
+# print(sensor.historic_data_temperature)
+
+# get the historic data of the sensors
+historic_data_temperature, temperature_max, temperature_min, temperature_len = sensor.historic_data_temperature
+historic_data_humidity, humidity_max, humidity_min, humidity_len = sensor.historic_data_humidity
+
+# calculate the max range y for temperature
+if temperature_max > 55:
+  temperature_range_y = temperature_max
+elif temperature_max > 35:
+  temperature_range_y = 60
+elif temperature_max > 15:
+  temperature_range_y = 40
+else:
+  temperature_range_y = 20
+
+print(temperature_range_y)
+
+x = list(range(0, temperature_len))
+ucartesian(plot_1, x, historic_data_temperature, rangex=[0, 143], rangey=[0, temperature_range_y], fill=True, line_color=BLACK)
+ucartesian(plot_2, x, historic_data_humidity, rangex=[0, 143], rangey=[0, 100], fill=True, line_color=BLACK)
 plot_1.append(plot_2)
 g.append(plot_1)
+
+# graph values
+font_10px = bitmap_font.load_font("fonts/Ubuntu-R-16.bdf")
+text_graph_temperature_max = label.Label(font_10px, text=f'{temperature_range_y}', color=FOREGROUND_COLOR, scale=1)
+text_graph_temperature_max.anchor_point = 0.0, 0.0
+text_graph_temperature_max.anchored_position = 0, 48
+g.append(text_graph_temperature_max)
+
+text_graph_temperature_min = label.Label(font_10px, text='0', color=FOREGROUND_COLOR, scale=1)
+text_graph_temperature_min.anchor_point = 0.0, 0.0
+text_graph_temperature_min.anchored_position = 0, 48 + 50
+g.append(text_graph_temperature_min)
+
+# ###################################
+# # For simulation only!!
+# temperatures = [20, 22]
+# humidity = [90, 95]
+# x = list(range(0, 50, 1))
+# temp_y = [choice(temperatures) for _ in x]
+# humidity_y = [choice(humidity) for _ in x]
+# ucartesian(plot_1, x, temp_y, rangex = [0, 143], rangey = [0, 40], fill = False, line_color = BLACK)
+# ucartesian(plot_2, x, humidity_y, rangex = [0, 143], rangey = [0, 100], fill = False, line_color = BLACK)
+# plot_1.append(plot_2)
+# g.append(plot_1)
+# ###################################
 
 display.show(g)
 display.refresh()

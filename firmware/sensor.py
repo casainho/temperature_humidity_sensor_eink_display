@@ -27,6 +27,9 @@ class MemoryForSensorData():
       self.tail_x2 = 0
       self.offset_address += 6
 
+    self.max_value = 0
+    self.min_value = 0
+
     self._update_variables()
 
   def _update_variables(self):
@@ -68,22 +71,44 @@ class MemoryForSensorData():
 
   @property
   def values(self):
+
+    self.max_value = 0
+    self.min_value = 0
+
     # check if ring buffer is empty
     if self.current_size < 1:
       return []
     
-    data = list([0] * self.capacity)
+    data = list([0] * self.current_size)
     head_x2 = self.head_x2
 
-    for i in range(self.capacity):
+    for i in range(len(data)):
       # get the element value
       # note that it must be dived by 10 as values are stored as ints
       data[i] = ((self.memory[self.offset_address + head_x2] << 8) + (self.memory[self.offset_address + head_x2 + 1] & 0xff)) / 10
 
+      if data[i] > self.max_value:
+        self.max_value = data[i]
+
+      if data[i] < self.min_value:
+        self.min_value = data[i]
+
       # move head forward
       head_x2 = (head_x2 + 2) % (self.capacity * 2)
 
-    return data    
+    return data
+  
+  @property
+  def len(self):
+    return self.current_size
+  
+  @property
+  def max(self):
+    return self.max_value
+  
+  @property
+  def min(self):
+    return self.min_value
 
 class Sensor(object):
   def __init__(self, i2c_clk_pin, i2c_sda_pin):
@@ -93,11 +118,7 @@ class Sensor(object):
     self.last_humidity = 0
     self.data_sensor_temperature = MemoryForSensorData(0, 144)
     new_offset = self.data_sensor_temperature.sensor_memory_offset # this is the memory offset (memory used by previous MemoryForSensorData())
-    self.data_sensor_humidity = MemoryForSensorData(new_offset, 144) 
-    
-    # # we want 144 values, of of every sensor read at every 10 minutes, that will be 24h: 144 --> 24h * (60 / 10)
-    # self.historic_temperature_simulated = [round(value / 3, 1) for value in range(0, 144, 1)]
-    # self.historic_humidity_simulated = [round(value / 2, 1) for value in range(5, 149, 1)]
+    self.data_sensor_humidity = MemoryForSensorData(new_offset, 144)
 
   def run_periodic(self):
     "Must be called every 5 minutes: will read and store the sensor data"
@@ -121,19 +142,15 @@ class Sensor(object):
   @property
   def historic_data_temperature(self):
     "Return an array of data"
-    return self.data_sensor_temperature.values
+    return self.data_sensor_temperature.values, \
+      self.data_sensor_temperature.max, \
+      self.data_sensor_temperature.min, \
+      self.data_sensor_temperature.len
 
   @property
   def historic_data_humidity(self):
     "Return an array of data"
-    return self.data_sensor_humidity.values
-
-  # @property
-  # def historic_data_temperature_simulated(self):
-  #   "Return an array of simulated data"
-  #   return self.historic_temperature_simulated
-
-  # @property
-  # def historic_data_humidity_simulated(self):
-  #   "Return an array of simulated data"
-  #   return self.historic_humidity_simulated
+    return self.data_sensor_humidity.values, \
+      self.data_sensor_humidity.max, \
+      self.data_sensor_humidity.min, \
+      self.data_sensor_humidity.len
