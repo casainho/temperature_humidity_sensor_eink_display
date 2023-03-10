@@ -15,7 +15,7 @@ import supervisor
 from adafruit_bitmap_font import bitmap_font
 
 # disable auto-reload
-supervisor.runtime.autoreload = False
+# supervisor.runtime.autoreload = False
 
 sensor = Sensor.Sensor(board.IO37, board.IO35)
 
@@ -54,19 +54,36 @@ palette[0] = BACKGROUND_COLOR
 t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
 g.append(t)
 
-text_temperature = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
-text_temperature.anchor_point = 0.0, 0.0
-text_temperature.anchored_position = 25, 0
+# custom fonts
+font_small = bitmap_font.load_font("fonts/Ubuntu-R-12.bdf")
+font_medium = bitmap_font.load_font("fonts/Ubuntu-R-18.bdf")
+font_big = bitmap_font.load_font("fonts/Ubuntu-R-42.bdf")
+
+
+text_temperature = label.Label(font_big, color=FOREGROUND_COLOR, scale=1)
+text_temperature.anchored_position = 70, 0
+text_temperature.anchor_point = 1.0, 0.0
 g.append(text_temperature)
 
-text_humidity = label.Label(terminalio.FONT, color=FOREGROUND_COLOR, scale=3)
-text_humidity.anchor_point = 0.0, 0.0
-text_humidity.anchored_position = 130, 0
+text_temperature_unity = label.Label(font_medium, text='ºC', color=FOREGROUND_COLOR, scale=1)
+text_temperature_unity.anchored_position = 73, 0
+text_temperature_unity.anchor_point = 0.0, -1.3
+g.append(text_temperature_unity)
+
+text_humidity = label.Label(font_big, color=FOREGROUND_COLOR, scale=1)
+text_humidity.anchored_position = 160, 0
+text_humidity.anchor_point = 1.0, 0.0
 g.append(text_humidity)
 
+text_humidity_unity = label.Label(font_medium, text='%', color=FOREGROUND_COLOR, scale=1)
+text_humidity_unity.anchored_position = 163, 0
+text_humidity_unity.anchor_point = 0.0, -1.3
+g.append(text_humidity_unity)
+
 sensor.run_periodic()
-text_temperature.text = f'{sensor.temperature}'
-text_humidity.text = f'{int(round(sensor.humidity, 0))}%'
+
+text_temperature.text = f'{int(round(sensor.temperature, 0))}'
+text_humidity.text = f'{int(round(sensor.humidity, 0))}'
 
 # print('---------------')
 # print(text_temperature.text)
@@ -122,8 +139,6 @@ elif temperature_max > 15:
 else:
   temperature_range_y = 20
 
-print(temperature_range_y)
-
 x = list(range(0, temperature_len))
 ucartesian(plot_1, x, historic_data_temperature, rangex=[0, 143], rangey=[0, temperature_range_y], fill=True, line_color=BLACK)
 ucartesian(plot_2, x, historic_data_humidity, rangex=[0, 143], rangey=[0, 100], fill=True, line_color=BLACK)
@@ -131,13 +146,13 @@ plot_1.append(plot_2)
 g.append(plot_1)
 
 # graph values
-font_10px = bitmap_font.load_font("fonts/Ubuntu-R-16.bdf")
-text_graph_temperature_max = label.Label(font_10px, text=f'{temperature_range_y}', color=FOREGROUND_COLOR, scale=1)
+
+text_graph_temperature_max = label.Label(font_small, text=f'{temperature_range_y}', color=FOREGROUND_COLOR, scale=1)
 text_graph_temperature_max.anchor_point = 0.0, 0.0
 text_graph_temperature_max.anchored_position = 0, 48
 g.append(text_graph_temperature_max)
 
-text_graph_temperature_min = label.Label(font_10px, text='0', color=FOREGROUND_COLOR, scale=1)
+text_graph_temperature_min = label.Label(font_small, text='100', color=FOREGROUND_COLOR, scale=1)
 text_graph_temperature_min.anchor_point = 0.0, 0.0
 text_graph_temperature_min.anchored_position = 0, 48 + 50
 g.append(text_graph_temperature_min)
@@ -164,3 +179,4 @@ alarm_to_sleep = alarm.time.TimeAlarm(monotonic_time = time.monotonic() + second
 alarm.exit_and_deep_sleep_until_alarms(alarm_to_sleep)
 # Does not return. Exits, and restarts after the sleep time.
   
+
