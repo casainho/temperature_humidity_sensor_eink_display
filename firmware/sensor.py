@@ -116,9 +116,9 @@ class Sensor(object):
     self.temperature_humidity_sensor = adafruit_ahtx0.AHTx0(i2c)
     self.last_temperature = 0
     self.last_humidity = 0
-    self.data_sensor_temperature = MemoryForSensorData(0, 144)
+    self.data_sensor_temperature = MemoryForSensorData(128, 288) # reserve the first 128 bytes free for other usages. 144 points, 2 bytes for each point = 288
     new_offset = self.data_sensor_temperature.sensor_memory_offset # this is the memory offset (memory used by previous MemoryForSensorData())
-    self.data_sensor_humidity = MemoryForSensorData(new_offset, 144)
+    self.data_sensor_humidity = MemoryForSensorData(new_offset, 288)
 
   def run_periodic(self):
     "Must be called every 5 minutes: will read and store the sensor data"
@@ -154,3 +154,4 @@ class Sensor(object):
       self.data_sensor_humidity.max, \
       self.data_sensor_humidity.min, \
       self.data_sensor_humidity.len
+
