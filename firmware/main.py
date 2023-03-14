@@ -62,7 +62,6 @@ sensor = Sensor.Sensor(board.IO37, board.IO35)
 sensor.run_periodic()
 ###############################################################
 
-
 g = displayio.Group()
 
 # Set a white background
@@ -154,9 +153,11 @@ historic_data_humidity, humidity_max, humidity_min, humidity_len = sensor.histor
 if temperature_max > 55:
   temperature_range_y = temperature_max
 elif temperature_max > 35:
-  temperature_range_y = 60
-elif temperature_max > 15:
+  temperature_range_y = 50
+elif temperature_max > 25:
   temperature_range_y = 40
+elif temperature_max > 15:
+  temperature_range_y = 30
 else:
   temperature_range_y = 20
 
@@ -170,7 +171,8 @@ ulogging(
   rangey=[0, temperature_range_y],
   line_color=color.BLACK,
   ticksx=[23, 47, 71, 95, 119, 143],
-  ticksy=[10, 20, 30]
+  ticksy=[10, 20, 30],
+  fill=True
   )
 
 ulogging(
@@ -181,14 +183,15 @@ ulogging(
   rangey=[0, 100],
   line_color=color.BLACK,
   ticksx=[23, 47, 71, 95, 119, 143],
-  ticksy=[25, 50, 75]
+  ticksy=[25, 50, 75],
+  fill=True 
   )
 
 plot_1.append(plot_2)
 g.append(plot_1)
 
 # graph values
-text_graph_temperature_min = label.Label(font_small, text=f'{temperature_min}', color=FOREGROUND_COLOR, scale=1)
+text_graph_temperature_min = label.Label(font_small, text='0', color=FOREGROUND_COLOR, scale=1)
 text_graph_temperature_min.anchor_point = 0.5, 0.0
 text_graph_temperature_min.anchored_position = 9, 100
 g.append(text_graph_temperature_min)

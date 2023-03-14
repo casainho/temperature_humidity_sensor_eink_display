@@ -27,8 +27,8 @@ class MemoryForSensorData():
       self.tail_x2 = 0
       self.offset_address += 6
 
-    self.max_value = 0
-    self.min_value = 0
+    self.max_value = None
+    self.min_value = None
 
     self._update_variables()
 
@@ -72,9 +72,6 @@ class MemoryForSensorData():
   @property
   def values(self):
 
-    self.max_value = 0
-    self.min_value = 0
-
     # check if ring buffer is empty
     if self.current_size < 1:
       return []
@@ -87,9 +84,16 @@ class MemoryForSensorData():
       # note that it must be dived by 10 as values are stored as ints
       data[i] = ((self.memory[self.offset_address + head_x2] << 8) + (self.memory[self.offset_address + head_x2 + 1] & 0xff)) / 10
 
+      # init max and min values
+      if self.max_value is None:
+        self.max_value = data[i]
+        self.min_value = data[i]
+
+      # update max_value
       if data[i] > self.max_value:
         self.max_value = data[i]
 
+      # update min_value
       if data[i] < self.min_value:
         self.min_value = data[i]
 
