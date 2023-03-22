@@ -19,7 +19,7 @@ class MemoryForSensorData():
       self.head_x2 = 0
       self.tail_x2 = 0
 
-    self.offset_address = 6 # we use 6 bytes
+    self.offset_address += 6 # we use 6 bytes
     self.max_value = None
     self.min_value = None
 

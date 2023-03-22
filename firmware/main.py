@@ -92,7 +92,7 @@ g.append(text_humidity_unity)
 # initialize the temperature and humidity sensor
 # make one read and store the values on the sleep memory
 #
-sensor = Sensor.Sensor(i2c_clk_pin = board.IO37, i2c_sda_pin = board.IO35, sleep_memory_offset = sleep_memory_offset)
+sensor = Sensor.Sensor(board.IO37, board.IO35, sleep_memory_offset)
 sensor.read_and_store()
 ###############################################################
 
@@ -167,7 +167,7 @@ plot_1 = Uplot(
     show_box=True,
     box_color=color.BLACK,
     background_color=color.WHITE,
-    scale=8)
+    scale=1)
 
 plot_2 = Uplot(
     0,
@@ -178,11 +178,11 @@ plot_2 = Uplot(
     show_box=True,
     box_color=color.BLACK,
     background_color=color.WHITE,
-    scale=4)
+    scale=1)
 
 # setting up the uplot tick parameters
-plot_1.tick_params(tickx_height = 5, ticky_height = 5, tickcolor = color.BLACK, tickgrid = False)
-plot_2.tick_params(tickx_height = 5, ticky_height = 5, tickcolor = color.BLACK, tickgrid = False)
+plot_1.tick_params(tickx_height=5, ticky_height=5, tickcolor=color.BLACK, tickgrid=False)
+plot_2.tick_params(tickx_height=5, ticky_height=5, tickcolor=color.BLACK, tickgrid=False)
 
 # create a list with values for the x axis
 x = list(range(0, temperature_len))
@@ -196,7 +196,7 @@ ulogging(
   rangey=[temperature_y_min, temperature_y_max],
   line_color=color.BLACK,
   ticksx=[23, 47, 71, 95, 119, 143],
-  ticksy=[int(round(temperature_y_min + (temperature_y_max - temperature_y_min) / 2, 1))],
+  ticksy=[int(round(temperature_y_min + ((temperature_y_max - temperature_y_min) / 2), 1))],
   fill=True
   )
 
@@ -296,7 +296,7 @@ display.refresh()
 # sleep for 600 seconds / 10 minutes
 # decrease the time it takes to get here since the start
 time_now = time.monotonic()
-seconds_to_sleep = 600 - time_now - time_start 
-alarm_to_sleep = alarm.time.TimeAlarm(seconds_to_sleep)
+seconds_to_sleep = time_now + (600 - (time_now - time_start))
+alarm_to_sleep = alarm.time.TimeAlarm(monotonic_time = seconds_to_sleep)
 alarm.exit_and_deep_sleep_until_alarms(alarm_to_sleep)
 # does not return. Exits, and restarts after the sleep time.
