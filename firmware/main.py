@@ -12,6 +12,7 @@ import sensor as Sensor
 from circuitpython_uplot.uplot import Uplot, color
 from circuitpython_uplot.ulogging import ulogging
 from adafruit_bitmap_font import bitmap_font
+from main_extra import *
 
 # disable CircuitPython auto-reload
 supervisor.runtime.autoreload = False
@@ -97,65 +98,16 @@ sensor.read_and_store()
 ###############################################################
 
 # write the temperature value to the text field - also round to have no decimals
-text_temperature.text = f'{int(round(sensor.temperature, 0))}'
+text_temperature.text = f'{round_to_int(sensor.temperature)}'
 # write the humidty value to the text field - also round to have no decimals
-text_humidity.text = f'{int(round(sensor.humidity, 0))}'
+text_humidity.text = f'{round_to_int(sensor.humidity)}'
 
 # get the historic data of the sensors from the sleep memory, so it will be displayed on the display
 historic_data_temperature, temperature_max, temperature_min, temperature_len = sensor.historic_data_temperature
 historic_data_humidity, humidity_max, humidity_min, humidity_len = sensor.historic_data_humidity
 
-# calculate the max ranges y for temperature
-if temperature_max > 60:
-  temperature_y_max = temperature_max
-elif temperature_max > 50:
-  temperature_y_max = 60
-elif temperature_max > 40:
-  temperature_y_max = 50
-elif temperature_max > 30:
-  temperature_y_max = 40
-elif temperature_max > 20:
-  temperature_y_max = 30
-elif temperature_max > 10:
-  temperature_y_max = 20
-else:
-  temperature_y_max = 10
-
-# calculate the min ranges y for temperature
-if temperature_min > 60:
-  temperature_y_min = temperature_min
-elif temperature_min > 50:
-  temperature_y_min = 50
-elif temperature_min > 40:
-  temperature_y_min = 40
-elif temperature_min > 30:
-  temperature_y_min = 30
-elif temperature_min > 20:
-  temperature_y_min = 20
-elif temperature_min > 10:
-  temperature_y_min = 10
-else:
-  temperature_y_min = 0
-
-# calculate the max ranges y for humidity
-if humidity_max > 75:
-  humidity_y_max = 100
-elif humidity_max > 50:
-  humidity_y_max = 75
-elif humidity_max > 25:
-  humidity_y_max = 50
-else:
-  humidity_y_max = 25
-
-# calculate the min ranges y for humidity
-if humidity_min > 75:
-  humidity_y_min = 75
-elif humidity_min > 50:
-  humidity_y_min = 50
-elif humidity_min > 25:
-  humidity_y_min = 25
-else:
-  humidity_y_min = 0
+temperature_y_max, temperature_y_min = get_temperature_y_values(temperature_max, temperature_min)
+humidity_y_max, humidity_y_min = get_humidity_y_values(humidity_max, humidity_min)
 
 # prepare the uplot objects: first graph for temperature and second for humidity
 plot_1 = Uplot(

@@ -1,0 +1,6 @@
+adafruit-circuitpython-supervisor
+adafruit-circuitpython-bitmap-font
+adafruit-circuitpython-busdevice
+adafruit-circuitpython-display_shapes
+adafruit-circuitpython-display_text
+circuitpython_uplot
