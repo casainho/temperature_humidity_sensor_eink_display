@@ -1,3 +1,5 @@
+from adafruit_bitmap_font import bitmap_font
+
 def round_to_int(value):
   return int(round(value, 0))
 
@@ -58,3 +60,15 @@ def get_humidity_y_values(humidity_max, humidity_min):
     humidity_y_min = 0
 
   return humidity_y_max, humidity_y_min
+
+def get_font_small():
+  return bitmap_font.load_font("fonts/Ubuntu-R-12.bdf")
+
+def get_font_medium():
+  return bitmap_font.load_font("fonts/Ubuntu-R-18.bdf")
+
+def get_font_big():
+  return bitmap_font.load_font("fonts/Ubuntu-R-42.bdf")
+
+def get_y_half_scale_value(y_max, y_min):
+  return int(round(y_min + ((y_max - y_min) / 2), 1))

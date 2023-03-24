@@ -61,9 +61,9 @@ t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
 g.append(t)
 
 # custom fonts
-font_small = bitmap_font.load_font("fonts/Ubuntu-R-12.bdf")
-font_medium = bitmap_font.load_font("fonts/Ubuntu-R-18.bdf")
-font_big = bitmap_font.load_font("fonts/Ubuntu-R-42.bdf")
+font_small = get_font_small()
+font_medium = get_font_medium()
+font_big = get_font_big()
 
 # temperature text field
 text_temperature = label.Label(font_big, color=FOREGROUND_COLOR, scale=1)
@@ -148,7 +148,7 @@ ulogging(
   rangey=[temperature_y_min, temperature_y_max],
   line_color=color.BLACK,
   ticksx=[23, 47, 71, 95, 119, 143],
-  ticksy=[int(round(temperature_y_min + ((temperature_y_max - temperature_y_min) / 2), 1))],
+  ticksy=[get_y_half_scale_value(temperature_y_max, temperature_y_min)],
   fill=True
   )
 
@@ -160,7 +160,7 @@ ulogging(
   rangey=[humidity_y_min, humidity_y_max],
   line_color=color.BLACK,
   ticksx=[23, 47, 71, 95, 119, 143],
-  ticksy=[int(round(humidity_y_min + (humidity_y_max - humidity_y_min) / 2, 1))],
+  ticksy=[get_y_half_scale_value(humidity_y_max, humidity_y_min)],
   fill=True 
   )
 
