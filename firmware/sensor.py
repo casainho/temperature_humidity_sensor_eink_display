@@ -1,23 +1,34 @@
 import busio
-import adafruit_ahtx0
-import alarm
+
+try:
+  import adafruit_ahtx0
+  import alarm
+  testing = False
+except Exception:
+  print("sensor.py: Assuming we are running the unit tests")
+  testing = True
 
 class MemoryForSensorData():
   def __init__(self, offset_address, capacity_x2):
-    self.memory = alarm.sleep_memory # from now own, use self.memory instead of alarm.sleep_memory
+    
+    if not testing:
+      self.memory = alarm.sleep_memory # from now own, use self.memory instead of alarm.sleep_memory
+    else:
+      self.memory = 0
+
     self.offset_address_initial = self.offset_address = offset_address
     self.capacity_x2 = capacity_x2
 
-    if alarm.wake_alarm:
+    # initial state of this variables
+    self.current_size = 0
+    self.head_x2 = 0
+    self.tail_x2 = 0
+
+    if not testing and alarm.wake_alarm:
       # recover the values from the sleep memory
       self.current_size = (self.memory[self.offset_address] << 8) + self.memory[self.offset_address + 1]
       self.head_x2 = (self.memory[self.offset_address] << 8) + self.memory[self.offset_address + 1]
       self.tail_x2 = (self.memory[self.offset_address] << 8) + self.memory[self.offset_address + 1]
-    else:
-      # initial state of this variables
-      self.current_size = 0
-      self.head_x2 = 0
-      self.tail_x2 = 0
 
     self.offset_address += 6 # we use 6 bytes
     self.max_value = None
@@ -61,11 +72,11 @@ class MemoryForSensorData():
       return []
     
     data = list([0] * self.current_size)
-    head_x2 = self.head_x2
-
+    head_x2 = 0
+  
     for i in range(len(data)):
       # get the element value
-      # note that it must be dived by 10 as values are stored as ints
+      # note that it must be dived by 10 as values are stored as ints 
       data[i] = ((self.memory[self.offset_address + head_x2] << 8) + (self.memory[self.offset_address + head_x2 + 1] & 0xff)) / 10
 
       # init max and min values
