@@ -111,8 +111,13 @@ class MemoryForSensorData():
 
 class Sensor(object):
   def __init__(self, i2c_clk_pin, i2c_sda_pin, sleep_memory_offset):
-    i2c = busio.I2C(i2c_clk_pin, i2c_sda_pin)
-    self.temperature_humidity_sensor = adafruit_ahtx0.AHTx0(i2c)
+    
+    if not testing:
+      i2c = busio.I2C(i2c_clk_pin, i2c_sda_pin)
+      self.temperature_humidity_sensor = adafruit_ahtx0.AHTx0(i2c)
+    else:
+      self.temperature_humidity_sensor = 0
+      
     self.last_temperature = 0
     self.last_humidity = 0
     self.data_sensor_temperature = MemoryForSensorData(sleep_memory_offset, 288) # 144 points, 2 bytes for each point = 288

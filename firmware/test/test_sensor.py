@@ -3,7 +3,7 @@ import sys
 sys.path.append('../')
 from sensor import *
 
-class SensorTests(unittest.TestCase):
+class MemoryForSensorDataTests(unittest.TestCase):
   def test_MemoryForSensorData_object(self):
     memory_sensor_data = MemoryForSensorData(0, 144*2)
     self.assertEqual(memory_sensor_data.memory, 0)
@@ -66,3 +66,12 @@ class SensorTests(unittest.TestCase):
     self.assertEqual(memory_sensor_data.len, 144)
     self.assertEqual(memory_sensor_data.max_value, 21.5)
     self.assertEqual(memory_sensor_data.min, 7.2)
+
+class SensorTests(unittest.TestCase):
+  def test_SensorTests_object(self):
+    sensor = Sensor(None, None, 0)
+    self.assertEqual(sensor.temperature_humidity_sensor, 0)
+    self.assertEqual(sensor.data_sensor_temperature.sensor_memory_offset, 294)
+    self.assertEqual(sensor.data_sensor_humidity.sensor_memory_offset, 294 * 2)
+    self.assertEqual(sensor.data_sensor_temperature.values, [])
+    self.assertEqual(sensor.data_sensor_humidity.values, [])
