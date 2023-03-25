@@ -20,7 +20,7 @@ class MemoryForSensorDataTests(unittest.TestCase):
     memory_sensor_data = MemoryForSensorData(0, 144*2)
     self.assertEqual(memory_sensor_data.sensor_memory_offset, (144*2) + 6)
 
-  def test_MemoryForSensorData_object_add(self):
+  def test_MemoryForSensorData_object_add_1(self):
     # testing adding 3 values
     memory_sensor_data = MemoryForSensorData(0, 144*2)
     memory = bytearray((144*2) + 6)
@@ -37,9 +37,8 @@ class MemoryForSensorDataTests(unittest.TestCase):
     self.assertEqual(memory[9], 7)
     self.assertEqual(memory[10], 0)
     self.assertEqual(memory[11], 9)
-    del(memory)
-    del(memory_sensor_data)
 
+  def test_MemoryForSensorData_object_add_2(self):
     # testing adding 216 values (216 values equal to 24h + 12h)
     memory_sensor_data = MemoryForSensorData(0, 144*2)
     memory = bytearray((144*2) + 6)
@@ -62,7 +61,6 @@ class MemoryForSensorDataTests(unittest.TestCase):
     sensor_values.sort() # sort in ascending order
     list_values_to_check = list([x / 10 for x in range(72, 216)])
     self.assertEqual(sensor_values, list_values_to_check)
-
     self.assertEqual(memory_sensor_data.len, 144)
     self.assertEqual(memory_sensor_data.max_value, 21.5)
     self.assertEqual(memory_sensor_data.min, 7.2)
