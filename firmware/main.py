@@ -11,7 +11,6 @@ from adafruit_display_text import label
 import sensor as Sensor
 from circuitpython_uplot.uplot import Uplot, color
 from circuitpython_uplot.ulogging import ulogging
-from adafruit_bitmap_font import bitmap_font
 from main_extra import *
 
 # disable CircuitPython auto-reload
