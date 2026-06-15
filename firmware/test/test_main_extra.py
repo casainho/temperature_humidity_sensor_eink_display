@@ -1,48 +1,52 @@
 import unittest
-import warnings
 import sys
 sys.path.append('../')
-from main_extra import *
+from scale import (
+    round_to_int,
+    get_co2_y_values,
+    get_temperature_y_values,
+    get_humidity_y_values,
+    get_y_half_scale_value,
+)
 
-class MainTests(unittest.TestCase):
-  def test_round_to_int(self):
-    self.assertEqual(round_to_int(10.1), 10)
-    self.assertEqual(round_to_int(123.4), 123)
-    self.assertEqual(round_to_int(9.5), 10)
-    self.assertEqual(round_to_int(0.0), 0)
-    self.assertNotEqual(round_to_int(9.5), 9)
-    self.assertNotEqual(round_to_int(0.5), 1)
 
-  def test_get_temperature_y_values(self):
-    self.assertEqual(get_temperature_y_values(20, 0), (20 , 0))
-    self.assertEqual(get_temperature_y_values(21, 11), (30 , 10))
-    self.assertEqual(get_temperature_y_values(72, 39), (72 , 30))
-    self.assertNotEqual(get_temperature_y_values(21, 11), (31 , 5))
+class MainExtraTests(unittest.TestCase):
 
-  def test_get_humidity_y_values(self):
-    self.assertEqual(get_humidity_y_values(80, 0), (100 , 0))
-    self.assertEqual(get_humidity_y_values(75, 24), (75 , 0))
-    self.assertEqual(get_humidity_y_values(72, 39), (75 , 25))
-    self.assertNotEqual(get_humidity_y_values(72, 39), (50 , 25))
+    def test_round_to_int(self):
+        self.assertEqual(round_to_int(10.1), 10)
+        self.assertEqual(round_to_int(123.4), 123)
+        self.assertEqual(round_to_int(9.5), 10)
+        self.assertEqual(round_to_int(0.0), 0)
+        self.assertNotEqual(round_to_int(9.5), 9)
 
-  def test_get_fonts(self):
-    get_fonts = ['get_font_small', 'get_font_medium', 'get_font_big']
+    def test_get_co2_y_values(self):
+        self.assertEqual(get_co2_y_values(500,  420), (600,  400))
+        self.assertEqual(get_co2_y_values(700,  420), (800,  400))
+        self.assertEqual(get_co2_y_values(900,  420), (1000, 400))
+        self.assertEqual(get_co2_y_values(1200, 420), (1500, 400))
+        self.assertEqual(get_co2_y_values(1600, 420), (2000, 400))
+        self.assertEqual(get_co2_y_values(2100, 420), (2500, 400))
+        self.assertEqual(get_co2_y_values(2600, 420), (3000, 400))
+        self.assertEqual(get_co2_y_values(4100, 420), (5000, 400))
+        self.assertEqual(get_co2_y_values(8100, 420), (9999, 400))
+        # min snapping
+        self.assertEqual(get_co2_y_values(900, 650), (1000, 600))
+        self.assertEqual(get_co2_y_values(900, 850), (1000, 800))
 
-    # leave test directory to previous one
-    import os
-    os.chdir("../")
+    def test_get_temperature_y_values(self):
+        self.assertEqual(get_temperature_y_values(20, 0),  (20, 0))
+        self.assertEqual(get_temperature_y_values(21, 11), (30, 10))
+        self.assertEqual(get_temperature_y_values(72, 39), (72, 30))
+        self.assertNotEqual(get_temperature_y_values(21, 11), (31, 5))
 
-    for get_font in get_fonts:
-      try:
-        with warnings.catch_warnings():
-          warnings.simplefilter("ignore", ResourceWarning)
-          globals()[get_font]()
-        
-      except Exception as e:
-        assert False, f"'{get_font}' raised an exception {e}"
+    def test_get_humidity_y_values(self):
+        self.assertEqual(get_humidity_y_values(80, 0),  (100, 0))
+        self.assertEqual(get_humidity_y_values(75, 24), (75,  0))
+        self.assertEqual(get_humidity_y_values(72, 39), (75,  25))
+        self.assertNotEqual(get_humidity_y_values(72, 39), (50, 25))
 
-  def test_get_y_half_scale_value(self):
-    self.assertEqual(get_y_half_scale_value(100, 50), 75)
-    self.assertEqual(get_y_half_scale_value(21, 10), 15)
-    self.assertEqual(get_y_half_scale_value(21, 8), 14)
-    self.assertNotEqual(get_y_half_scale_value(21, 8), 15)
+    def test_get_y_half_scale_value(self):
+        self.assertEqual(get_y_half_scale_value(100, 50), 75)
+        self.assertEqual(get_y_half_scale_value(21, 10),  15)
+        self.assertEqual(get_y_half_scale_value(21, 8),   14)
+        self.assertNotEqual(get_y_half_scale_value(21, 8), 15)

@@ -1,6 +1,11 @@
-adafruit-circuitpython-supervisor
-adafruit-circuitpython-bitmap-font
-adafruit-circuitpython-busdevice
-adafruit-circuitpython-display_shapes
-adafruit-circuitpython-display_text
-circuitpython_uplot
+# MicroPython firmware for ESP32-C3
+# All hardware drivers are bundled in this repository — no external packages required.
+#
+# Required MicroPython version: >= 1.22 for ESP32-C3
+# Flash with:
+#   esptool.py --chip esp32c3 --port <PORT> erase_flash
+#   esptool.py --chip esp32c3 --port <PORT> write_flash -z 0x0 <micropython.bin>
+#
+# Host dependencies for running unit tests with pytest:
+pytest
+pytest-cov
