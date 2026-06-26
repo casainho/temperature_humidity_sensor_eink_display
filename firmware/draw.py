@@ -64,3 +64,4 @@ def draw_graph(fb, x, y, w, h, data, y_min, y_max, fill=True, x_steps=None):
 
     for i in range(1, len(pts)):
         fb.line(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], BLACK)
+

@@ -79,3 +79,4 @@ class SSD1681:
 
     def sleep(self):
         self._cmd(_DEEP_SLEEP); self._data(0x01)  # deep sleep, retain RAM
+

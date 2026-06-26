@@ -84,3 +84,4 @@ def get_humidity_y_values(humidity_max, humidity_min):
 
 def get_y_half_scale_value(y_max, y_min):
     return int(round(y_min + (y_max - y_min) / 2, 1))
+

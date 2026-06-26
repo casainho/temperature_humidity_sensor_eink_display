@@ -144,6 +144,9 @@ class Sensor:
         self._last_temp  = 0.0
         self._last_humid = 0.0
 
+        if not _testing:
+            self._sensor.set_asc_enabled(False)
+
         # CO2 stored as raw ppm integer (scale=1)
         self._data_co2   = MemoryForSensorData(sleep_memory_offset, 180 * 2, scale=1)
         sleep_memory_offset = self._data_co2.sensor_memory_offset
@@ -169,6 +172,9 @@ class Sensor:
         self._data_humid.add(int(self._last_humid * 10))
 
         _save_mem(_mem)
+
+    def calibrate_co2(self, target_ppm=400):
+        self._sensor.perform_forced_recalibration(target_ppm)
 
     @property
     def co2(self):
@@ -196,3 +202,4 @@ class Sensor:
     def historic_data_humidity(self):
         v = self._data_humid.values
         return v, self._data_humid.max, self._data_humid.min, self._data_humid.len
+

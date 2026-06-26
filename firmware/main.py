@@ -38,6 +38,7 @@ REFRESH_INTERVAL_MS = 20_000
 DEBUG_DUMP_FRAMEBUFFER = True
 DUMP_CHUNK_SIZE = 64
 WARMUP_READS = 4
+GRAPH_STORE_EVERY = 8  # store 1 graph point every 8 cycles (8 × 20 s = 160 s → 180 pts = 8 h)
 
 # ---------------------------------------------------------------------------
 # Wake counter (bytes 0-2 of shared RTC memory)
@@ -132,8 +133,8 @@ def _draw_screen(fb, co2, temp, humid, co2_data, co2_y_min, co2_y_max,
     _draw_y_label(fb, co2_y_mid, TOP_GY + TOP_GH // 2 - SM_H // 2)
     _draw_y_label(fb, co2_y_min, TOP_GY + TOP_GH - SM_H)
     draw_graph(fb, GX, TOP_GY, GW, TOP_GH, co2_data, co2_y_min, co2_y_max, x_steps=X_STEPS)
-    draw_text(fb, font_small, '30m', _x_label_for_zero_center(font_small, '30m', X12H), TOP_GY + TOP_GH + 2)
-    draw_text(fb, font_small, '1h', X24H - text_width(font_small, '1h'), TOP_GY + TOP_GH + 2)
+    draw_text(fb, font_small, '4h', _x_label_for_zero_center(font_small, '4h', X12H), TOP_GY + TOP_GH + 2)
+    draw_text(fb, font_small, '8h', X24H - text_width(font_small, '8h'), TOP_GY + TOP_GH + 2)
 
     # Second graph: temperature
     temp_y_mid = get_y_half_scale_value(temp_y_max, temp_y_min)
@@ -141,8 +142,8 @@ def _draw_screen(fb, co2, temp, humid, co2_data, co2_y_min, co2_y_max,
     _draw_y_label(fb, temp_y_mid, BOT_GY + BOT_GH // 2 - SM_H // 2)
     _draw_y_label(fb, temp_y_min, BOT_GY + BOT_GH - SM_H)
     draw_graph(fb, GX, BOT_GY, GW, BOT_GH, temp_data, temp_y_min, temp_y_max, x_steps=X_STEPS)
-    draw_text(fb, font_small, '30m', _x_label_for_zero_center(font_small, '30m', X12H), BOT_GY + BOT_GH + 2)
-    draw_text(fb, font_small, '1h', X24H - text_width(font_small, '1h'), BOT_GY + BOT_GH + 2)
+    draw_text(fb, font_small, '4h', _x_label_for_zero_center(font_small, '4h', X12H), BOT_GY + BOT_GH + 2)
+    draw_text(fb, font_small, '8h', X24H - text_width(font_small, '8h'), BOT_GY + BOT_GH + 2)
 
     # Bottom-left cycle counter
     draw_text(fb, font_small, str(counter_value), 0, BOTTOM)
@@ -179,6 +180,29 @@ display = SSD1681(
     busy=Pin(EINK_BUSY, Pin.IN),
 )
 
+_CAL_FLAG = '/cal_flag'
+
+def _cal_flag_value():
+    try:
+        with open(_CAL_FLAG) as f:
+            return int(f.read().strip())
+    except Exception:
+        return 1
+
+def _set_cal_flag(value):
+    with open(_CAL_FLAG, 'w') as f:
+        f.write(str(value))
+
+if _cal_flag_value() == 0:
+    sensor.calibrate_co2()
+    _set_cal_flag(1)
+    display.fb.fill(WHITE)
+    msg = 'CO2 calibrated'
+    draw_text(display.fb, font_medium, msg,
+              max(0, (200 - text_width(font_medium, msg)) // 2), 91)
+    display.show()
+    time.sleep_ms(20_000)
+
 sample_count = 0
 while True:
     cycle_start = time.ticks_ms()
@@ -188,7 +212,7 @@ while True:
     _mem[1] = (counter >> 8) & 0xFF
     _mem[2] = counter & 0xFF
 
-    if sample_count < WARMUP_READS:
+    if sample_count < WARMUP_READS or (sample_count % GRAPH_STORE_EVERY) != 0:
         sensor.read()
     else:
         sensor.read_and_store()
@@ -213,3 +237,4 @@ while True:
 
     elapsed_ms = time.ticks_diff(time.ticks_ms(), cycle_start)
     time.sleep_ms(max(0, REFRESH_INTERVAL_MS - elapsed_ms))
+
